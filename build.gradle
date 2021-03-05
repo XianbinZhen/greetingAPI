@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id "org.sonarqube" version "3.1.1"
+}
+
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// you can now use gradle to build a fat jar
+// jar vs a fat jar
+// a normal jar would contain only your code
+// a fat jar will contain your code plus all the dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': version,
+                'Main-Class': 'dev.ranieri.app.App'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    compile group: 'io.javalin', name: 'javalin', version: '3.13.3'
+    compile "org.slf4j:slf4j-simple:1.7.30"
+
+    // implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.28.Final'
+    // the compile function will actually build the dependency into the applicaiton
+    // implemenentation will allow you to just use the API and libraries when run in an IDE
+}
+
+test {
+    useJUnitPlatform()
+}
